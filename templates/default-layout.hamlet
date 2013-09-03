@@ -1,0 +1,5 @@
+$maybe msg <- mmsg
+    <div #message>#{msg}
+<a href=@{BooksR}>List of books
+<a href=@{AddBookR}>Add book
+^{widget}

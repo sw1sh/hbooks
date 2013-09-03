@@ -1,0 +1,11 @@
+dist*
+static/tmp/
+static/img/covers
+config/client_session_key.aes
+*.hi
+*.o
+*.sqlite3
+.hsenv*
+yesod-devel/
+*.un~
+*.swp

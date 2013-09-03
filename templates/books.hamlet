@@ -1,0 +1,4 @@
+$forall Entity bid book <- books
+  <li>
+    <a href=@{BookR bid}>#{bookTitle book}
+  
