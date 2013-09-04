@@ -13,5 +13,6 @@ Cover
 Book
     title Text
     cover CoverId
+    type ContentType
     deriving Show
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)

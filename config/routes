@@ -8,3 +8,4 @@
 /list BooksR GET
 /book/#BookId BookR GET
 /add AddBookR GET POST
+/download/#BookId DownloadR GET

@@ -1,2 +1,6 @@
-<p>#{title}
+<h1>#{title}
 <img src=#{imageSrc}>
+<br>
+Type: #{contentType}
+<br>
+<a href=#{fileUrl}>Download
