@@ -1,6 +1,6 @@
 dist*
 static/tmp/
-static/img/covers
+static/img/thumbs
 static/books/
 config/client_session_key.aes
 *.hi
