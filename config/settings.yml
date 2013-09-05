@@ -15,5 +15,5 @@ Staging:
   <<: *defaults
 
 Production:
-  #approot: "http://www.example.com"
+  approot: "http://host-9ul.a.msu"
   <<: *defaults

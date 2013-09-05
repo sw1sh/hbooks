@@ -3,6 +3,7 @@
 module Handler.Books where
 
 import Import
+import Yesod.Auth
 import Data.Conduit (runResourceT, ($$))
 import Data.Conduit.Binary (sinkLbs)
 import Network.Wai
@@ -16,6 +17,7 @@ getBooksR = do
 
 getAddBookR :: Handler Html
 getAddBookR = do
+  id <- requireAuthId
   ((res, form), enctype) <- runFormPost bookForm
   let reshowForm = defaultLayout $(widgetFile "bookform")
   case res of

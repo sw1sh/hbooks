@@ -2,4 +2,8 @@ $maybe msg <- mmsg
     <div #message>#{msg}
 <a href=@{BooksR}>List of books
 <a href=@{AddBookR}>Add book
+$maybe _ <- mAuthId 
+  <a href=@{AuthR LogoutR}>Logout
+$nothing
+  <a href=@{AuthR LoginR}>Login
 ^{widget}

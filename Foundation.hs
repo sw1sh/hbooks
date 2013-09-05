@@ -1,10 +1,13 @@
 module Foundation where
 
-import Prelude
+import ClassyPrelude hiding (insert)
 import Yesod
 import Yesod.Static
 import Yesod.Auth
-import Yesod.Auth.BrowserId
+import Network.Mail.Mime
+import Text.Shakespeare.Text (stext)
+import Text.Blaze.Renderer.Utf8 (renderHtml)
+import Yesod.Auth.Email
 import Yesod.Auth.GoogleEmail
 import Yesod.Default.Config
 import Yesod.Default.Util (addStaticContentExternal)
@@ -73,7 +76,8 @@ instance Yesod App where
     defaultLayout widget = do
         master <- getYesod
         mmsg <- getMessage
-
+        
+        mAuthId <- maybeAuthId
         -- We break up the default layout into two components:
         -- default-layout is the contents of the body tag, and
         -- default-layout-wrapper is the entire page. Since the final
@@ -118,7 +122,8 @@ instance Yesod App where
         development || level == LevelWarn || level == LevelError
 
     makeLogger = return . appLogger
-
+    
+    maximumContentLength _ _ = Just $ 15 * 1024 * 1024 -- 15 megabytes
 -- How to run database actions.
 instance YesodPersist App where
     type YesodPersistBackend App = SqlPersistT
@@ -139,12 +144,76 @@ instance YesodAuth App where
         case x of
             Just (Entity uid _) -> return $ Just uid
             Nothing -> do
-                fmap Just $ insert $ User (credsIdent creds) Nothing
+                fmap Just $ insert $ User (credsIdent creds) Nothing Nothing False
 
     -- You can add other plugins like BrowserID, email or OAuth here
-    authPlugins _ = [authBrowserId def, authGoogleEmail]
+    authPlugins _ = [authEmail, authGoogleEmail]
 
     authHttpManager = httpManager
+
+instance YesodAuthEmail App where
+    type AuthEmailId App = UserId
+
+    addUnverified email verkey =
+        runDB $ insert $ User email Nothing (Just verkey) False
+
+    sendVerifyEmail email _ verurl =
+        liftIO $ renderSendMail (emptyMail $ Address Nothing "noreply")
+            { mailTo = [Address Nothing email]
+            , mailHeaders =
+                [ ("Subject", "Verify your email address")
+                ]
+            , mailParts = [[textPart, htmlPart]]
+            }
+      where
+        textPart = Part
+            { partType = "text/plain; charset=utf-8"
+            , partEncoding = None
+            , partFilename = Nothing
+            , partContent = encodeUtf8 [stext|
+Please confirm your email address by clicking on the link below.
+
+\#{verurl}
+
+Thank you
+|]
+            , partHeaders = []
+            }
+        htmlPart = Part
+            { partType = "text/html; charset=utf-8"
+            , partEncoding = None
+            , partFilename = Nothing
+            , partContent = renderHtml [shamlet|
+<p>Please confirm your email address by clicking on the link below.
+<p>
+    <a href=#{verurl}>#{verurl}
+<p>Thank you
+|]
+            , partHeaders = []
+            }
+    getVerifyKey = runDB . fmap (join . fmap userVerkey) . get
+    setVerifyKey uid key = runDB $ update uid [UserVerkey =. Just key]
+    verifyAccount uid = runDB $ do
+        mu <- get uid
+        case mu of
+            Nothing -> return Nothing
+            Just u -> do
+                update uid [UserVerified =. True]
+                return $ Just uid
+    getPassword = runDB . fmap (join . fmap userPassword) . get
+    setPassword uid pass = runDB $ update uid [UserPassword =. Just pass]
+    getEmailCreds email = runDB $ do
+        mu <- getBy $ UniqueUser email
+        case mu of
+            Nothing -> return Nothing
+            Just (Entity uid u) -> return $ Just EmailCreds
+                { emailCredsId = uid
+                , emailCredsAuthId = Just uid
+                , emailCredsStatus = isJust $ userPassword u
+                , emailCredsVerkey = userVerkey u
+                , emailCredsEmail = email
+                }
+    getEmail = runDB . fmap (fmap userIdent) . get
 
 -- This instance is required to use forms. You can modify renderMessage to
 -- achieve customized and internationalized form validation messages.

@@ -1,6 +1,8 @@
 User
     ident Text
-    password Text Maybe
+    password Text Maybe -- Password may not be set yet
+    verkey Text Maybe -- Used for resetting passwords
+    verified Bool
     UniqueUser ident
     deriving Typeable
 Email
