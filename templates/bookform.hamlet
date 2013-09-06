@@ -1,3 +1,7 @@
 <form method=post enctype=#{enctype}>
   ^{form}
-  <button type=submit>Add book
+  <button type=submit>
+    $maybe _ <- maybeBook 
+      Edit
+    $nothing
+      Add

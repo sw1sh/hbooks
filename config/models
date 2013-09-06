@@ -12,6 +12,9 @@ Email
     UniqueEmail email
 Book
     title Text
-    type ContentType
+    contentType ContentType
+    type BookType
+    category BookCategory
+    contentExtension Text
     deriving Show
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)

@@ -1,13 +1,17 @@
-module Model where
+module Model (
+  module Lib.MyPersist,
+  module Model
+  ) where
 
 import ClassyPrelude
 import Yesod
 import Database.Persist.Quasi
 import Data.Conduit
-import Data.Conduit.Binary
+import Data.Conduit.Binary (sinkLbs)
 import Graphics.ImageMagick.MagickWand
 import Network.Curl
 import Lib.ImageMagick
+import Lib.MyPersist
 
 showPersist (PersistInt64 i) = show i
 showPersist _ = undefined 
@@ -15,6 +19,8 @@ showPersist _ = undefined
 showId = showPersist . unKey
 
 splitWords = concat . intersperse "\n" . words
+
+getFileExt = reverse . takeWhile (/='.') . reverse
 
 saveThumbnail :: Maybe FileInfo -> Text -> FilePath ->  IO ()
 saveThumbnail (Just fi) _ name = withMagickWandGenesis $ do
@@ -51,14 +57,15 @@ saveThumbnail Nothing title name = withMagickWandGenesis $ do
 saveFile :: ByteString -> FilePath ->  IO ()
 saveFile body name = writeFile (repack $  "static/books" </> name) body
 
-downloadFile :: Text -> IO (Either String (String, ByteString))
+downloadFile :: Text -> IO (Either String (String, String, ByteString))
 downloadFile url = do
   resp <- curlGetResponse_ (unpack url) [CurlUserAgent "curl"]
     :: IO (CurlResponse_ [(String, String)] ByteString)
   IDouble size <- respGetInfo resp SizeDownload
   IString contentType <- respGetInfo resp ContentType
+  IString url <- respGetInfo resp EffectiveUrl
   case respCurlCode resp of
-    CurlOK -> return $ Right (contentType, respBody resp)
+    CurlOK -> return $ Right (contentType, getFileExt url, respBody resp)
     err -> return $ Left $ show err
 
 -- You can define all of your database entities in the entities file.

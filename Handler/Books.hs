@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, ScopedTypeVariables, ViewPatterns #-}
+{-# LANGUAGE OverloadedStrings, ScopedTypeVariables, ViewPatterns, RecordWildCards #-}
 
 module Handler.Books where
 
@@ -48,13 +48,18 @@ modifyBookR maybeBid = do
   ((res, form), enctype) <- runFormPost $ bookForm maybeBook
   let reshowForm = defaultLayout $(widgetFile "bookform")
   case res of
-    FormSuccess (title, maybeThumb, maybeFile, maybeUrl) -> do
+    FormSuccess (title, typ, category, maybeThumb, maybeFile, maybeUrl) -> do
       let finishAction bid = do
             liftIO $ saveThumbnail maybeThumb title $ showId bid
             redirect $ BookR bid
       case maybeFile of
         Just file -> do 
-          bid <- modifyBook maybeBid $ Book title (fromString . unpack $ fileContentType file)
+          bid <- modifyBook maybeBid 
+            $ Book { bookTitle = title,
+                     bookContentType = fromString . unpack $ fileContentType file,
+                     bookType = typ,
+                     bookCategory = category,
+                     bookContentExtension = getFileExt $ fileName file }
           content <- runResourceT $ fileSource file $$ sinkLbs
           liftIO $ saveFile (repack content) (showId bid)
           finishAction bid
@@ -63,8 +68,13 @@ modifyBookR maybeBid = do
             Just url -> do
               res <- liftIO $ downloadFile url
               case res of
-                Right (contentType, body) -> do
-                  bid <- modifyBook maybeBid $ Book title (fromString contentType)
+                Right (contentType, ext, body) -> do
+                  bid <- modifyBook maybeBid 
+                    $ Book { bookTitle = title,
+                             bookContentType = fromString contentType,
+                             bookType = typ,
+                             bookCategory = category,
+                             bookContentExtension = fromString ext }
                   liftIO $ saveFile body $ showId bid
                   finishAction bid
                 Left err -> do
@@ -73,7 +83,7 @@ modifyBookR maybeBid = do
             Nothing ->
               case maybeBid of
                 Just bid -> do
-                  runDB $ update bid [BookTitle =. title]
+                  runDB $ update bid [BookTitle =. title, BookType =. typ, BookCategory =. category]
                   finishAction bid
                 Nothing -> do
                   setMessage "Upload file or provide a link."
@@ -84,22 +94,30 @@ modifyBookR maybeBid = do
 
 getBookR :: BookId -> Handler Html
 getBookR bid = do
-  Book title (show -> contentType :: Text) <- runDB $ get404 bid
+  Book {bookTitle = title, bookContentType = decodeUtf8 -> contentType} <- runDB $ get404 bid
   let imageSrc = "/static/img/thumbs/" ++ showId bid :: Text
       fileUrl = "/download/" ++ showId bid :: Text
   defaultLayout $(widgetFile "book")
       
 getDownloadR :: BookId -> Handler Html
 getDownloadR bid = do
-  Book title contentType <- runDB $ get404 bid
+  Book {bookTitle = title, bookContentType = contentType, bookContentExtension = ext, ..} <- runDB $ get404 bid
   let file = ResponseFile ok200 
-        [("Content-Disposition", "filename=" ++ encodeUtf8 title ), (hContentType, contentType)] 
+        [ ("Content-Disposition", "filename=" ++ encodeUtf8 ("\"" ++ title ++ "." ++ ext ++ "\"") ), 
+          (hContentType, contentType)] 
         ("static/books/" ++ showId bid) Nothing
   sendWaiResponse file
 
-bookForm :: Maybe Book -> Form (Text, Maybe FileInfo, Maybe FileInfo, Maybe Text)
-bookForm maybeBook = renderDivs $ (,,,)
-    <$> areq textField "Title" (bookTitle <$> maybeBook)
-    <*> fileAFormOpt "Thumbnail image"
-    <*> fileAFormOpt "Upload file"
-    <*> aopt textField "File URL" Nothing
+bookForm :: Maybe Book -> Form (Text, BookType, BookCategory, Maybe FileInfo, Maybe FileInfo, Maybe Text)
+bookForm maybeBook = renderDivs $ (,,,,,)
+  <$> areq textField "Title" (bookTitle <$> maybeBook)
+  <*> areq (selectFieldList types) "Type" (bookType <$> maybeBook)
+  <*> areq (selectFieldList categories) "Category" (bookCategory <$> maybeBook)
+  <*> fileAFormOpt "Thumbnail image"
+  <*> fileAFormOpt "Upload file"
+  <*> aopt textField "File URL" Nothing
+  where
+    types = [("Textbook",Textbook), ("Lecture Notes",LectureNotes), ("Other",OtherType)] :: [(Text, BookType)]
+    categories = [("Methematics",Mathematics), ("Physics",Physics), ("Humanities",Humanities)] :: [(Text, BookCategory)]
+    
+

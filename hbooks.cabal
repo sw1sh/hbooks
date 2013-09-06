@@ -23,6 +23,7 @@ library
                      Handler.Books
     other-modules:   Lib.ImageMagick
                      Lib.ImageMagickFFI
+                     Lib.MyPersist
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
