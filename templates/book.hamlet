@@ -4,3 +4,5 @@
 Type: #{contentType}
 <br>
 <a href=#{fileUrl}>Download
+<a href=@{EditBookR bid}>Edit
+<a href=@{DeleteBookR bid}>Delete

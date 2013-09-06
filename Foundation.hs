@@ -214,6 +214,7 @@ Thank you
                 , emailCredsEmail = email
                 }
     getEmail = runDB . fmap (fmap userIdent) . get
+    afterPasswordRoute _ = BooksR
 
 -- This instance is required to use forms. You can modify renderMessage to
 -- achieve customized and internationalized form validation messages.

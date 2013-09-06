@@ -5,10 +5,8 @@ module Lib.ImageMagickFFI where
 
 import           Prelude
 import           Foreign
-import           Foreign.C.String
 import           Foreign.C.Types
 
-import           Graphics.ImageMagick.MagickCore.Types
 import           Graphics.ImageMagick.MagickWand.FFI.Types
 
 #include "/usr/include/ImageMagick/wand/MagickWand.h"

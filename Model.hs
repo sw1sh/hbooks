@@ -1,12 +1,10 @@
 module Model where
 
 import ClassyPrelude
-import ClassyPrelude.Classes
 import Yesod
 import Database.Persist.Quasi
 import Data.Conduit
 import Data.Conduit.Binary
-import Graphics.ImageMagick.MagickCore.Types
 import Graphics.ImageMagick.MagickWand
 import Network.Curl
 import Lib.ImageMagick

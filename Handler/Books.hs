@@ -16,41 +16,71 @@ getBooksR = do
   defaultLayout $(widgetFile "books")
 
 getAddBookR :: Handler Html
-getAddBookR = do
-  id <- requireAuthId
-  ((res, form), enctype) <- runFormPost bookForm
+getAddBookR = modifyBookR Nothing
+
+postAddBookR :: Handler Html
+postAddBookR = getAddBookR
+
+getEditBookR :: BookId -> Handler Html
+getEditBookR bid = modifyBookR $ Just bid
+
+postEditBookR :: BookId -> Handler Html
+postEditBookR = getEditBookR
+
+getDeleteBookR :: BookId -> Handler Html
+getDeleteBookR bid = do
+  requireAuth
+  runDB $ delete bid
+  redirect BooksR
+
+modifyBook maybeBid book =
+  case maybeBid of
+    Just bid -> do
+      runDB $ replace bid book
+      return bid
+    Nothing -> do
+      runDB $ insert book
+
+modifyBookR maybeBid = do
+  requireAuth
+  alreadyExpired
+  maybeBook <- maybe (return Nothing) (runDB . get) maybeBid 
+  ((res, form), enctype) <- runFormPost $ bookForm maybeBook
   let reshowForm = defaultLayout $(widgetFile "bookform")
   case res of
     FormSuccess (title, maybeThumb, maybeFile, maybeUrl) -> do
+      let finishAction bid = do
+            liftIO $ saveThumbnail maybeThumb title $ showId bid
+            redirect $ BookR bid
       case maybeFile of
         Just file -> do 
-          bid <- runDB $ insert $ Book title (fromString . unpack $ fileContentType file)
-          liftIO $ saveThumbnail maybeThumb title $ showId bid
+          bid <- modifyBook maybeBid $ Book title (fromString . unpack $ fileContentType file)
           content <- runResourceT $ fileSource file $$ sinkLbs
           liftIO $ saveFile (repack content) (showId bid)
-          redirect $ BookR bid
+          finishAction bid
         Nothing -> 
           case maybeUrl of
             Just url -> do
               res <- liftIO $ downloadFile url
               case res of
                 Right (contentType, body) -> do
-                  bid <- runDB $ insert $ Book title (fromString contentType)
-                  liftIO $ saveThumbnail maybeThumb title $ showId bid
+                  bid <- modifyBook maybeBid $ Book title (fromString contentType)
                   liftIO $ saveFile body $ showId bid
-                  redirect $ BookR bid
+                  finishAction bid
                 Left err -> do
                   setMessage $ toHtml err
                   reshowForm
-            Nothing -> do
-              setMessage "Upload file or provide a link."
-              reshowForm
+            Nothing ->
+              case maybeBid of
+                Just bid -> do
+                  runDB $ update bid [BookTitle =. title]
+                  finishAction bid
+                Nothing -> do
+                  setMessage "Upload file or provide a link."
+                  reshowForm
     _ -> do
       setMessage "Fill all required fields."
       reshowForm
-
-postAddBookR :: Handler Html
-postAddBookR = getAddBookR
 
 getBookR :: BookId -> Handler Html
 getBookR bid = do
@@ -67,9 +97,9 @@ getDownloadR bid = do
         ("static/books/" ++ showId bid) Nothing
   sendWaiResponse file
 
-bookForm :: Form (Text,Maybe FileInfo,Maybe FileInfo,Maybe Text)
-bookForm = renderDivs $ (,,,)
-    <$> areq textField "Title" Nothing
+bookForm :: Maybe Book -> Form (Text, Maybe FileInfo, Maybe FileInfo, Maybe Text)
+bookForm maybeBook = renderDivs $ (,,,)
+    <$> areq textField "Title" (bookTitle <$> maybeBook)
     <*> fileAFormOpt "Thumbnail image"
     <*> fileAFormOpt "Upload file"
     <*> aopt textField "File URL" Nothing
