@@ -1,9 +1,12 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module Model (
   module Lib.MyPersist,
   module Model
   ) where
 
 import ClassyPrelude
+import Prelude (read)
 import Yesod
 import Database.Persist.Quasi
 import Data.Conduit
@@ -68,9 +71,33 @@ downloadFile url = do
     CurlOK -> return $ Right (contentType, getFileExt url, respBody resp)
     err -> return $ Left $ show err
 
+instance ToJSON BookType where
+  toJSON bt = toJSON (show bt :: Text)
+
+instance ToJSON BookCategory where
+  toJSON bt = toJSON (show bt :: Text)
+
+instance FromJSON BookType where
+  parseJSON (String f) = return $ read $ unpack f
+
+instance FromJSON BookCategory where
+  parseJSON (String f) = return $ read $ unpack f
+  
 -- You can define all of your database entities in the entities file.
 -- You can find more information on persistent and how to declare entities
 -- at:
 -- http://www.yesodweb.com/book/persistent/
 share [mkPersist sqlOnlySettings, mkMigrate "migrateAll"]
     $(persistFileWith lowerCaseSettings "config/models")
+
+showTags :: [Tag] -> Text
+showTags = concat . intersperse " " . map tagName
+
+toTags :: Maybe Text -> [Tag]
+toTags (Just t) = map Tag $ words t
+toTags Nothing = []
+
+bookTypes = map (show&&&id) [minBound..maxBound] :: [(Text, BookType)]
+bookCategories = map (show&&&id) [minBound..maxBound] :: [(Text, BookCategory)]
+
+

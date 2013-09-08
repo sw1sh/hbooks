@@ -10,11 +10,18 @@ Email
     user UserId Maybe
     verkey Text Maybe
     UniqueEmail email
-Book
+Tag json
+    name Text
+    UniqueName name
+    deriving Show
+Book json
     title Text
+    author Text
     contentType ContentType
+    contentExtension Text
+    externalLink Text Maybe
     type BookType
     category BookCategory
-    contentExtension Text
+    tags [TagId]
     deriving Show
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)

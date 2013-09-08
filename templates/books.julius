@@ -1,0 +1,45 @@
+jQuery(function($) {
+  $("#search_button").click();
+});
+
+$('#search_field').keypress(function(e) {
+  if(e.which == 13) {
+    $('#search_button').click();
+  }
+});
+
+$('.category, .tag').click(function() {
+  $(this).toggleClass('active');
+  $('#search_button').click();
+});
+
+$("#search_button").click(function() {
+  var query = $("#search_field").val();
+  var categories = '';
+  var tags = '';
+  $('.category.active').each(function() {
+    categories = categories + $(this).attr('id') + ' ';
+  });
+  $('.tag.active').each(function() {
+    tags = tags + $(this).attr('id') + ' ';
+  });
+  $.getJSON('/search?q='+query+'&c='+categories+'&t='+tags)
+  .done(function (data) {
+    var items = [];
+ 
+    $.each(data, function(key, val) {
+      items.push(
+        '<li id="' + key + '">' 
+          + '<a href=/book/' + val.key + '>' + val.value.title + 
+        '</li>'
+      );
+    });
+ 
+    $("#list").html(
+      $('<ul/>', {
+        html: items.join('')
+      })
+    );
+  });  
+})
+

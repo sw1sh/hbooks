@@ -1,4 +1,15 @@
-$forall Entity bid book <- books
-  <li>
-    <a href=@{BookR bid}>#{bookTitle book}
+<div class=input-prepend>
+  <button class=btn id=search_button type=submit>Search
+  <input class="span2 search-query" id=search_field type=text autofocus=true name=q>
+
+<div class=row>
+  <div class=span2>
+    $forall (category,_) <- bookCategories
+      <li>
+        <a class=category id=#{category}>#{category}
+  <div class=span8 id=list>
+  <div class=span2>
+    $forall Entity tid tag <- tags
+      <li>
+        <a class=tag id=#{tagName tag}>#{tagName tag}
   

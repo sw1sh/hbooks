@@ -1,7 +1,15 @@
 exec: ../dist/build/hbooks/hbooks
 args:
     - production
-host: <<HOST-NOT-SET>>
+host: "host-9ul.a.msu"
+ssl: false
+extra-hosts:
+  - "127.0.0.1:8000"
+
+#Static file hosts. Keter handles the serving for you.
+#static-hosts:
+#  - host: static.host-9ul.a.msu
+#    root: ../static # relative to config file, just like the executable
 
 # Use the following to automatically copy your bundle upon creation via `yesod
 # keter`. Uses `scp` internally, so you can set it to a remote destination

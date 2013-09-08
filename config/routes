@@ -11,3 +11,4 @@
 /edit/#BookId EditBookR GET POST
 /delete/#BookId DeleteBookR GET
 /download/#BookId DownloadR GET
+/search SearchR GET
