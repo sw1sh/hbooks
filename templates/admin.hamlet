@@ -1,0 +1,7 @@
+<h1>Admin Panel
+<ul>Users
+  $forall Entity _ user <- users
+    <li>#{userIdent user}
+<ul>Tags
+  $forall Entity _ tag <- tags
+    <li>#{tagName tag}

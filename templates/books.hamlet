@@ -4,9 +4,9 @@
 
 <div class=row>
   <div class=span2>
-    $forall (category,_) <- bookCategories
+    $forall (icategory,category) <- bookCategories
       <li>
-        <a class=category id=#{category}>#{category}
+        <a class=category id=#{asText $ show category}>_{icategory}
   <div class=span8 id=list>
   <div class=span2>
     $forall Entity tid tag <- tags

@@ -1,0 +1,7 @@
+$('.lang').click(function() {
+  $.post('/lang', { lang: $(this).attr('id') },
+    function() {
+      location.reload();
+    }
+  );
+});

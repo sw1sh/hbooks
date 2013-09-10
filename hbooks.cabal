@@ -22,6 +22,7 @@ library
                      Handler.Home
                      Handler.Books
                      Handler.Search
+                     Handler.Admin
     other-modules:   Lib.ImageMagick
                      Lib.ImageMagickFFI
                      Lib.MyPersist

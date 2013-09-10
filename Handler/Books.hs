@@ -27,22 +27,30 @@ getEditBookR bid = modifyBookR $ Just bid
 postEditBookR :: BookId -> Handler Html
 postEditBookR = getEditBookR
 
-getDeleteBookR :: BookId -> Handler Html
-getDeleteBookR bid = do
-  requireAuth
-  runDB $ delete bid
-  redirect BooksR
+deleteBookR :: BookId -> Handler Html
+deleteBookR bid = do
+  uid <- requireAuthId
+  book <- runDB $ get404 bid
+  let ownerId = bookOwner book
+  if uid == ownerId then do
+    runDB $ delete bid 
+    redirect BooksR
+    else
+      error "You're not allowed to delete this!"
 
-modifyBook maybeBid book =
+modifyBook uid maybeBid book =
   case maybeBid of
-    Just bid -> do
-      runDB $ replace bid book
-      return bid
+    Just bid ->
+      if uid == bookOwner book then do
+        runDB $ replace bid book
+        return bid
+      else
+        error "You're not allowed to edit this!"
     Nothing -> do
       runDB $ insert book
 
 modifyBookR maybeBid = do
-  requireAuth
+  uid <- requireAuthId
   alreadyExpired
   maybeBook <- maybe (return Nothing) (runDB . get) maybeBid
   tags <- getTags $ bookTags <$> maybeBook
@@ -58,17 +66,17 @@ modifyBookR maybeBid = do
                   maybeFile, 
                   maybeUrl, 
                   isDownload) -> do
-      eitherTags <- mapM (runDB . insertBy) tags
-      let takeId (Left (Entity id _)) = id
-          takeId (Right id) = id
-          tagIds = map takeId eitherTags
+      
+      maybeTags <- mapM (runDB . getByValue) tags
+      let tagIds = map (\(Entity id _) -> id) $ catMaybes maybeTags
           finishAction bid = do
             liftIO $ saveThumbnail maybeThumb title $ showId bid
             redirect $ BookR bid
       case maybeFile of
         Just file -> do    
-          bid <- modifyBook maybeBid 
-            $ Book { bookTitle = title,
+          bid <- modifyBook uid maybeBid 
+            $ Book { bookOwner = uid,
+                     bookTitle = title,
                      bookAuthor = author,
                      bookContentType = fromString . unpack $ fileContentType file,
                      bookContentExtension = getFileExt $ fileName file,
@@ -85,8 +93,9 @@ modifyBookR maybeBid = do
               res <- liftIO $ downloadFile url
               case res of
                 Right (contentType, ext, body) -> do
-                  bid <- modifyBook maybeBid 
-                    $ Book { bookTitle = title,
+                  bid <- modifyBook uid maybeBid 
+                    $ Book { bookOwner = uid,
+                             bookTitle = title,
                              bookAuthor = author,
                              bookContentType = fromString contentType,
                              bookContentExtension = fromString ext, 
@@ -100,8 +109,9 @@ modifyBookR maybeBid = do
                   setMessage $ toHtml err
                   reshowForm
             (Just url, False) -> do
-              bid <- modifyBook maybeBid 
-                $ Book { bookTitle = title,
+              bid <- modifyBook uid maybeBid 
+                $ Book { bookOwner = uid,
+                         bookTitle = title,
                          bookAuthor = author,
                          bookContentType = "link",
                          bookContentExtension = "", 
@@ -119,10 +129,10 @@ modifyBookR maybeBid = do
                                        BookTags =. tagIds ]
                   finishAction bid
                 Nothing -> do
-                  setMessage "Upload file or provide a link."
+                  setMessageI MsgUploadOrProvideUrl
                   reshowForm
     _ -> do
-      setMessage "Fill all required fields."
+      setMessageI MsgFillAllRequired
       reshowForm
 
 getBookR :: BookId -> Handler Html
@@ -161,15 +171,15 @@ bookForm :: Maybe Book -> [Tag] -> Form (
   Bool -- Download from URL
   )
 bookForm maybeBook tags = renderDivs $ (,,,,,,,,)
-  <$> areq textField "Title" (bookTitle <$> maybeBook)
-  <*> areq textField "Author" (bookAuthor <$> maybeBook)
-  <*> areq (selectFieldList bookTypes) "Type" (bookType <$> maybeBook)
-  <*> areq (selectFieldList bookCategories) "Category" (bookCategory <$> maybeBook)
-  <*> aopt textField "Tags" (Just $ Just $ showTags tags)
-  <*> fileAFormOpt "Thumbnail image"
-  <*> fileAFormOpt "Upload file"
-  <*> aopt textField "File URL" (bookExternalLink <$> maybeBook)
-  <*> areq checkBoxField "Download?" (Just False)
+  <$> areq textField (fieldSettingsLabel MsgTitle) (bookTitle <$> maybeBook)
+  <*> areq textField (fieldSettingsLabel MsgAuthor) (bookAuthor <$> maybeBook)
+  <*> areq (selectFieldList bookTypes) (fieldSettingsLabel MsgType) (bookType <$> maybeBook)
+  <*> areq (selectFieldList bookCategories) (fieldSettingsLabel MsgCategory) (bookCategory <$> maybeBook)
+  <*> aopt textField (fieldSettingsLabel MsgTags) (Just $ Just $ showTags tags)
+  <*> fileAFormOpt (fieldSettingsLabel MsgThumbnail)
+  <*> fileAFormOpt (fieldSettingsLabel MsgUpload)
+  <*> aopt textField (fieldSettingsLabel MsgUrl) (bookExternalLink <$> maybeBook)
+  <*> areq checkBoxField (fieldSettingsLabel MsgDownloadQ) (Just False)
     
 getTags :: Maybe [TagId] -> Handler [Tag]
 getTags (Just ids) = do

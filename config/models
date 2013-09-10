@@ -3,6 +3,7 @@ User
     password Text Maybe -- Password may not be set yet
     verkey Text Maybe -- Used for resetting passwords
     verified Bool
+    admin Bool default=False
     UniqueUser ident
     deriving Typeable
 Email
@@ -15,6 +16,7 @@ Tag json
     UniqueName name
     deriving Show
 Book json
+    owner UserId default=1
     title Text
     author Text
     contentType ContentType

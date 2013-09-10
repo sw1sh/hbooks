@@ -97,7 +97,3 @@ toTags :: Maybe Text -> [Tag]
 toTags (Just t) = map Tag $ words t
 toTags Nothing = []
 
-bookTypes = map (show&&&id) [minBound..maxBound] :: [(Text, BookType)]
-bookCategories = map (show&&&id) [minBound..maxBound] :: [(Text, BookCategory)]
-
-

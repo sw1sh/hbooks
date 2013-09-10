@@ -1,8 +1,8 @@
 <h1>#{title}
 <img src=#{imageSrc}>
 <br>
-Type: #{contentType}
+_{MsgType}: #{contentType}
 <br>
-<a href=#{fileUrl}>Download
-<a href=@{EditBookR bid}>Edit
-<a href=@{DeleteBookR bid}>Delete
+<a href=#{fileUrl}>_{MsgDownload}
+<a href=@{EditBookR bid}>_{MsgEntryEdit}
+<a id=delete>_{MsgEntryDelete}

@@ -33,6 +33,14 @@ getSearchR = do
   
   let bookFilter = [ queryF, BookCategory <-. categories ]
                      
-
+  
   books <- runDB $ selectList bookFilter [Asc BookId]
-  returnJson $ if null tagIds then books else filter (any (`elem`tagIds) . (\(Entity _ b) -> bookTags b)) books
+  returnJson $ 
+    if null tagIds then 
+      books 
+      else filter (any (`elem`tagIds) . bookTags . entityVal) books
+
+translate dict get set x = 
+  case lookup (get x) dict of
+    Just v -> set x v 
+    Nothing -> x

@@ -1,9 +1,19 @@
 $maybe msg <- mmsg
     <div #message>#{msg}
-<a href=@{BooksR}>List of books
-$maybe _ <- mAuthId 
-  <a href=@{AddBookR}>Add book
-  <a href=@{AuthR LogoutR}>Logout
-$nothing
-  <a href=@{AuthR LoginR}>Login
+<div class=row>
+  <div class=span10>
+    <a href=@{BooksR}>_{MsgEntryList}
+    $maybe Entity _ user <- maybeUser 
+      _{MsgLoginAs $ userIdent user}
+      <br>
+      <a href=@{AddBookR}>_{MsgEntryAdd}
+      <a href=@{AuthR LogoutR}>_{MsgLogout}
+      $if userAdmin user
+        <a href=@{AdminR}>_{MsgAdmin}
+    $nothing
+      <a href=@{AuthR LoginR}>_{MsgLogin}
+  <div class=span2>
+    <a class=lang id=en>eng
+    <a class=lang id=ru>рус
+    <a class=lang id=jp>日本語
 ^{widget}

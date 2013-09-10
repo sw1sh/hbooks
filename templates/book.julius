@@ -1,0 +1,9 @@
+$('#delete').click(function(){
+  if (confirm("Are you sure you want to delete?")) {    
+    $.ajax({
+      type: "DELETE"
+    }).done(function() {
+      $(location).attr('href',"@{BooksR}");
+    });
+  };
+});

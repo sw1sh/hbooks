@@ -4,11 +4,12 @@
 /favicon.ico FaviconR GET
 /robots.txt RobotsR GET
 
-/ HomeR GET POST
+/ HomeR GET
+/lang LangR POST
 /list BooksR GET
-/book/#BookId BookR GET
+/book/#BookId BookR GET DELETE
 /add AddBookR GET POST
 /edit/#BookId EditBookR GET POST
-/delete/#BookId DeleteBookR GET
 /download/#BookId DownloadR GET
 /search SearchR GET
+/admin AdminR GET

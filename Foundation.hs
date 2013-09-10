@@ -77,8 +77,7 @@ instance Yesod App where
         master <- getYesod
         mmsg <- getMessage
         
-        mAuthId <- maybeAuthId
-
+        maybeUser <- maybeAuth
         -- We break up the default layout into two components:
         -- default-layout is the contents of the body tag, and
         -- default-layout-wrapper is the entire page. Since the final
@@ -146,7 +145,7 @@ instance YesodAuth App where
         case x of
             Just (Entity uid _) -> return $ Just uid
             Nothing -> do
-                fmap Just $ insert $ User (credsIdent creds) Nothing Nothing False
+                fmap Just $ insert $ User (credsIdent creds) Nothing Nothing False False
 
     -- You can add other plugins like BrowserID, email or OAuth here
     authPlugins _ = [authEmail, authGoogleEmail]
@@ -157,7 +156,7 @@ instance YesodAuthEmail App where
     type AuthEmailId App = UserId
 
     addUnverified email verkey =
-        runDB $ insert $ User email Nothing (Just verkey) False
+        runDB $ insert $ User email Nothing (Just verkey) False False
 
     sendVerifyEmail email _ verurl =
         liftIO $ renderSendMail (emptyMail $ Address Nothing "noreply")
