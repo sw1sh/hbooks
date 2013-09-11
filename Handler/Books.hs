@@ -139,7 +139,7 @@ getBookR :: BookId -> Handler Html
 getBookR bid = do
   Book { bookTitle = title, 
          bookAuthor = author,
-         bookContentType = decodeUtf8 -> contentType, 
+         bookContentType = (decodeUtf8 -> contentType), 
          bookExternalLink = maybeUrl } <- runDB $ get404 bid
   let imageSrc = "/static/img/thumbs/" ++ showId bid :: Text
       fileUrl = 

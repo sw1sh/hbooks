@@ -1,9 +1,9 @@
 Default: &defaults
-  user: "swish"
+  user: "hbooks"
   password: ",fkfkfqrf"
-  host: localhost
+  host: "localhost"
   port: 5432
-  database: hbooks
+  database: "hbooks"
   poolsize: 10
 
 Development:
@@ -19,6 +19,9 @@ Staging:
   <<: *defaults
 
 Production:
-  database: hbooks_production
+  user: "hvmorimqtdcuqw"
+  password: "WPa2modq1lv9gspMClna_9q_0E"
+  host: "ec2-184-73-162-34.compute-1.amazonaws.com"
+  database: "d90r27bp7l474a"
   poolsize: 100
   <<: *defaults

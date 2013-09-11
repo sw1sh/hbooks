@@ -9,7 +9,7 @@ import           Foreign.C.Types
 
 import           Graphics.ImageMagick.MagickWand.FFI.Types
 
-#include "/usr/include/ImageMagick/wand/MagickWand.h"
+#include "wand/MagickWand.h"
 
 foreign import ccall "MagickThumbnailImage" magickThumbnailImage
   :: Ptr MagickWand

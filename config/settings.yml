@@ -1,7 +1,7 @@
 Default: &defaults
   host: "*4" # any IPv4 host
-  port: 3000
-  approot: "http://swish.dnsd.me:3000"
+  port: 4321
+  approot: "http://localhost:4321"
   copyright: Powered by Yesod
   #analytics: UA-YOURCODE
 
@@ -15,5 +15,5 @@ Staging:
   <<: *defaults
 
 Production:
-  approot: "http://host-9ul.a.msu"
+  approot: "http://hbooks.herokuapp.com"
   <<: *defaults

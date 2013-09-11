@@ -37,17 +37,17 @@ saveThumbnail Nothing title name = withMagickWandGenesis $ do
   (_,dw) <- drawingWand
   pw <- pixelWand
 
-  pw `setColor` "none"
+  pw `setColor` "white"
   -- Create a new transparent image
   newImage w 120 150 pw
   -- Set up a 9 point white font
-  pw `setColor` "white"
+  pw `setColor` "black"
   dw `setFillColor` pw
-  dw `setFont` "VerdanaBI"
+  dw `setFont` "Arial"
   dw `setFontSize` 10
   -- Add a black outline to the text
-  pw `setColor` "black"
-  dw `setStrokeColor` pw
+--  pw `setColor` "black"
+--  dw `setStrokeColor` pw
   -- Turn antialias on - not sure this makes a difference
   dw `setTextAntialias` True
   -- Now draw the text
