@@ -44,10 +44,10 @@ $("#search_button").click(function() {
                  </div> \
                  <div class=row-fluid> \
                    <div class="span3 offset3">'
-                     + val.value.type + ' \
+                     + $('a.type#'+val.value.type).html() + ' \
                    </div> \
                    <div class="span3 offset3">'
-                     + val.value.category + ' \
+                     + $('a.category#'+val.value.category).html() + ' \
                    </div> \
                  </div> \
                </div> \

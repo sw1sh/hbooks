@@ -4,6 +4,8 @@
 
 <div class=row>
   <div class=span2>
+    $forall (itype,type) <- bookTypes
+      <a class=type id=#{asText $ show type} style="visibility: hidden">_{itype}
     $forall (icategory,category) <- bookCategories
       <li>
         <a class=category id=#{asText $ show category}>_{icategory}
