@@ -15,6 +15,7 @@ import Graphics.ImageMagick.MagickWand
 import Network.Curl
 import Lib.ImageMagick
 import Lib.MyPersist
+import Lib.S3
 
 showPersist (PersistInt64 i) = show i
 showPersist _ = undefined 
@@ -31,7 +32,9 @@ saveThumbnail (Just fi) _ name = withMagickWandGenesis $ do
   blob <- repack <$> (runResourceT $ fileSource fi $$ sinkLbs)
   readImageBlob w blob
   thumbnailImage w 120 150
-  writeImage w $ Just $ "static/img/thumbs" </> name
+--  writeImage w $ Just $ "static/img/thumbs" </> name
+  blob <- getImageBlob w
+  lift $ uploadToS3 ("img" </> name) (fileContentType fi) [] blob
 saveThumbnail Nothing title name = withMagickWandGenesis $ do
   (_,w) <- magickWand
   (_,dw) <- drawingWand
@@ -55,10 +58,12 @@ saveThumbnail Nothing title name = withMagickWandGenesis $ do
   -- Draw the image on to the magick_wand
   drawImage w dw
   setImageFormat w "png"
-  writeImage w $ Just $ "static/img/thumbs" </> name
+  blob <- getImageBlob w
+  lift $ uploadToS3 ("img" </> name) "image/png" [] blob
  
-saveFile :: ByteString -> FilePath ->  IO ()
-saveFile body name = writeFile (repack $  "static/books" </> name) body
+saveFile :: FilePath -> Text -> Text -> ByteString -> IO ()
+saveFile name contentType filename blob = uploadToS3 ("files" </> name) contentType 
+  [("Content-Disposition", "filename=\"" ++ filename ++ "\"")] blob
 
 downloadFile :: Text -> IO (Either String (String, String, ByteString))
 downloadFile url = do

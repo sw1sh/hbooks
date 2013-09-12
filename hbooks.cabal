@@ -26,6 +26,7 @@ library
     other-modules:   Lib.ImageMagick
                      Lib.ImageMagickFFI
                      Lib.MyPersist
+                     Lib.S3
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
@@ -84,6 +85,7 @@ library
                  , http-types                    >= 0.8
                  , mime-mail                     >= 0.4
                  , blaze-markup                  >= 0.5
+                 , hS3                           >= 0.5
 
 executable         hbooks
     if flag(library-only)

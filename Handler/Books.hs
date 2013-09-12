@@ -74,18 +74,19 @@ modifyBookR maybeBid = do
             redirect $ BookR bid
       case maybeFile of
         Just file -> do    
+          let ext = getFileExt $ fileName file
           bid <- modifyBook uid maybeBid 
             $ Book { bookOwner = uid,
                      bookTitle = title,
                      bookAuthor = author,
                      bookContentType = fromString . unpack $ fileContentType file,
-                     bookContentExtension = getFileExt $ fileName file,
+                     bookContentExtension = ext,
                      bookExternalLink = Nothing,
                      bookType = typ,
                      bookCategory = category,
                      bookTags = tagIds }
           content <- runResourceT $ fileSource file $$ sinkLbs
-          liftIO $ saveFile (repack content) (showId bid)
+          liftIO $ saveFile (showId bid) (fileContentType file) (title ++ "." ++ ext) (repack content)
           finishAction bid
         Nothing -> 
           case (maybeUrl, isDownload) of
@@ -103,7 +104,7 @@ modifyBookR maybeBid = do
                              bookType = typ,
                              bookCategory = category,
                              bookTags = tagIds }
-                  liftIO $ saveFile body $ showId bid
+                  liftIO $ saveFile (showId bid) (fromString contentType) (title ++ "." ++ fromString ext) body
                   finishAction bid
                 Left err -> do
                   setMessage $ toHtml err
@@ -141,7 +142,7 @@ getBookR bid = do
          bookAuthor = author,
          bookContentType = (decodeUtf8 -> contentType), 
          bookExternalLink = maybeUrl } <- runDB $ get404 bid
-  let imageSrc = "/static/img/thumbs/" ++ showId bid :: Text
+  let imageSrc = "http://s3.amazonaws.com/hbooks-static/img/" ++ showId bid :: Text
       fileUrl = 
         case maybeUrl of
           Just url -> url
@@ -149,15 +150,7 @@ getBookR bid = do
   defaultLayout $(widgetFile "book")
       
 getDownloadR :: BookId -> Handler Html
-getDownloadR bid = do
-  Book { bookTitle = title, 
-         bookContentType = contentType, 
-         bookContentExtension = ext, .. } <- runDB $ get404 bid
-  let file = ResponseFile ok200 
-        [ ("Content-Disposition", "filename=" ++ encodeUtf8 ("\"" ++ title ++ "." ++ ext ++ "\"") ), 
-          (hContentType, contentType)] 
-        ("static/books/" ++ showId bid) Nothing
-  sendWaiResponse file
+getDownloadR bid = redirect ("http://s3.amazonaws.com/hbooks-static/files/" ++ showId bid :: String)
 
 bookForm :: Maybe Book -> [Tag] -> Form (
   Text, -- Title

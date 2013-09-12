@@ -32,7 +32,7 @@ $("#search_button").click(function() {
         '<div class=book_item id=' + key + '>' 
         + '<div class="row-fluid show-grid"> \
              <div class=span2> \
-               <img src=/static/img/thumbs/' + val.key + '> \
+               <img src=http://s3.amazonaws.com/hbooks-static/img/' + val.key + '> \
              </div> \
              <div class=span10> \
                <div class="row-fluid show-grid span12"> \
