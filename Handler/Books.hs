@@ -70,7 +70,11 @@ modifyBookR maybeBid = do
       maybeTags <- mapM (runDB . getByValue) tags
       let tagIds = map (\(Entity id _) -> id) $ catMaybes maybeTags
           finishAction bid = do
-            liftIO $ saveThumbnail maybeThumb title $ showId bid
+            case maybeBook of
+              Just b | bookTitle b == title && isNothing maybeThumb ->
+                return ()
+              _ ->
+                liftIO $ saveThumbnail maybeThumb title $ showId bid
             redirect $ BookR bid
       case maybeFile of
         Just file -> do    
