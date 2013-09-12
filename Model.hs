@@ -29,18 +29,27 @@ getFileExt = reverse . takeWhile (/='.') . reverse
 saveThumbnail :: Maybe FileInfo -> Text -> FilePath ->  IO ()
 saveThumbnail (Just fi) _ name = withMagickWandGenesis $ do
   (_,w) <- magickWand
+  pw <- pixelWand
   blob <- repack <$> (runResourceT $ fileSource fi $$ sinkLbs)
   readImageBlob w blob
-  thumbnailImage w 120 150
---  writeImage w $ Just $ "static/img/thumbs" </> name
+  setColor pw "none"
+  setImageBackgroundColor w pw
+  width <- getImageWidth w
+  height <- getImageHeight w
+  let s = max width height
+      sx = s - width
+      sy = s - height
+  extentImage w s s (-sx`div`2) (-sy`div`2)
+  resizeImage w 120 150 lanczosFilter 1
   blob <- getImageBlob w
   lift $ uploadToS3 ("img" </> name) (fileContentType fi) [] blob
+
 saveThumbnail Nothing title name = withMagickWandGenesis $ do
   (_,w) <- magickWand
   (_,dw) <- drawingWand
   pw <- pixelWand
 
-  pw `setColor` "white"
+  pw `setColor` "none"
   -- Create a new transparent image
   newImage w 120 150 pw
   -- Set up a 9 point white font
