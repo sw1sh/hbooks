@@ -125,6 +125,7 @@ modifyBookR maybeBid = do
               case maybeBid of
                 Just bid -> do
                   runDB $ update bid [ BookTitle =. title, 
+                                       BookAuthor =. author,
                                        BookType =. typ, 
                                        BookCategory =. category, 
                                        BookTags =. tagIds ]
