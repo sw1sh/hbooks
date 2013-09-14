@@ -7,7 +7,7 @@
 / HomeR GET
 /lang LangR POST
 /list BooksR GET
-/book/#BookId BookR GET DELETE
+/book/#BookId BookR GET POST
 /add AddBookR GET POST
 /edit/#BookId EditBookR GET POST
 /download/#BookId DownloadR GET

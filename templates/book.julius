@@ -1,7 +1,8 @@
 $('#delete').click(function(){
   if (confirm("Are you sure you want to delete?")) {    
     $.ajax({
-      type: "DELETE"
+      type: 'POST',
+      data: {method: 'delete'}
     }).done(function() {
       $(location).attr('href',"@{BooksR}");
     });

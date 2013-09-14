@@ -27,16 +27,20 @@ getEditBookR bid = modifyBookR $ Just bid
 postEditBookR :: BookId -> Handler Html
 postEditBookR = getEditBookR
 
-deleteBookR :: BookId -> Handler Html
-deleteBookR bid = do
-  uid <- requireAuthId
-  book <- runDB $ get404 bid
-  let ownerId = bookOwner book
-  if uid == ownerId then do
-    runDB $ delete bid 
-    redirect BooksR
-    else
-      error "You're not allowed to delete this!"
+postBookR :: BookId -> Handler Html
+postBookR bid = do
+  method <- runInputPost $ ireq textField "method"
+  case method of
+    "delete" -> do
+      uid <- requireAuthId
+      book <- runDB $ get404 bid
+      let ownerId = bookOwner book
+      if uid == ownerId then do
+        runDB $ delete bid 
+        redirect BooksR
+        else
+          error "You're not allowed to delete this!"
+    _ -> error "Unknown method"
 
 modifyBook uid maybeBid book =
   case maybeBid of
