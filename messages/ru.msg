@@ -26,6 +26,7 @@ Textbook: Учебник
 LectureNotes: Лекции
 OtherType: Другое
 
+Categories: Категории
 Physics: Физика
 Mathematics: Математика
 Humanities: Гуманитарные науки

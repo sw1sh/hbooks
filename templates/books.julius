@@ -25,11 +25,12 @@ $("#search_button").click(function() {
   });
   $.getJSON('/search?q='+query+'&c='+categories+'&t='+tags)
   .done(function (data) {
-    var items = [];
+    var items = "";
  
     $.each(data, function(key, val) {
-      items.push(
-        '<div class=book_item id=' + key + '>' 
+      items +=
+        '<tr><td> \
+         <div class=book_item id=' + key + '>' 
         + '<div class="row-fluid show-grid"> \
              <div class=span2> \
                <img src=http://s3.amazonaws.com/hbooks-static/img/' + val.key + '> \
@@ -53,15 +54,13 @@ $("#search_button").click(function() {
                </div> \
                </div> \
              </div> \
-           </div>'
-      );
+           </div> \
+         </div> \
+         </td></tr>';
     });
- 
-    $("#list").html(
-      $('<div>', {
-        html: items.join('')
-      })
-    );
+    $("#list").html($('<table>',
+      { html: items }).addClass("table table-striped"));
+  
   });  
 })
 

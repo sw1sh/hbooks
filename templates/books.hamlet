@@ -1,17 +1,22 @@
-<div class=input-prepend>
-  <button class=btn id=search_button type=submit>Search
-  <input class="span2 search-query" id=search_field type=text autofocus=true name=q>
+<div .row-fluid>
+  <form ."form-search span10 offset2">
+     <div ."input-prepend">
+        <button .btn #search_button type=button>Search
+        <input .search-query #search_field type=text autofocus=true name=q>
 
-<div class=row>
-  <div class=span2>
-    $forall (itype,type) <- bookTypes
-      <a class=type id=#{asText $ show type} style="visibility: hidden">_{itype}
-    $forall (icategory,category) <- bookCategories
-      <li>
-        <a class=category id=#{asText $ show category}>_{icategory}
-  <div class=span8 id=list>
-  <div class=span2>
-    $forall Entity tid tag <- tags
-      <li>
-        <a class=tag id=#{tagName tag}>#{tagName tag}
-  
+  <div .row-fluid>
+    <div .span2>
+      $forall (itype,type) <- bookTypes
+        <a .type ##{asText $ show type} style="visibility: hidden">_{itype}
+      <ul ."nav nav-list">
+        <li .nav-header>_{MsgCategories}
+        $forall (icategory,category) <- bookCategories
+          <li>
+            <a .category ##{asText $ show category}>_{icategory}
+    <div .span8>
+      <div ."content" #list>
+    <div .span2>
+      $forall Entity tid tag <- tags
+        <li>
+          <a .tag ##{tagName tag}>#{tagName tag}
+    

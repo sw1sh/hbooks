@@ -1,19 +1,42 @@
-$maybe msg <- mmsg
-    <div #message>#{msg}
-<div class=row>
-  <div class=span10>
-    <a href=@{BooksR}>_{MsgEntryList}
-    $maybe Entity _ user <- maybeUser 
-      _{MsgLoginAs $ userIdent user}
-      <br>
-      <a href=@{AddBookR}>_{MsgEntryAdd}
-      <a href=@{AuthR LogoutR}>_{MsgLogout}
-      $if userAdmin user
-        <a href=@{AdminR}>_{MsgAdmin}
-    $nothing
-      <a href=@{AuthR LoginR}>_{MsgLogin}
-  <div class=span2>
-    <a class=lang id=en>eng
-    <a class=lang id=ru>рус
-    <a class=lang id=jp>日本語
-^{widget}
+<header ."header navbar">
+  <nav .navbar-inner>
+    <div .container>
+      <a .brand href=@{BooksR}>H
+      <ul .nav>
+        $maybe Entity _ user <- maybeUser 
+          <li>
+            _{MsgLoginAs $ userIdent user}  
+          <li>
+            <a href=@{AddBookR}>_{MsgEntryAdd}
+          <li>
+            <a href=@{AuthR LogoutR}>_{MsgLogout}
+          $if userAdmin user
+            <li>
+              <a href=@{AdminR}>_{MsgAdmin}
+        $nothing
+          <li>
+            <a href=@{AuthR LoginR}>_{MsgLogin}
+      <ul ."nav pull-right">
+        <ul .nav>
+          <li>
+            <a .lang id=en>eng
+          <li>
+            <a .lang id=ru>рус
+          <li>
+            <a .lang id=jp>日本語
+
+<div #main role=main>
+  <div .container>
+    <div .row>
+      <div .span12>
+        $maybe msg <- mmsg
+          <div .alert>
+            <button .close type="button" data-dismiss="alert">
+              &times;
+            #{msg}
+        
+  <div .container-fluid>
+    ^{widget}
+
+<footer ."footer navbar navbar-fixed-bottom">
+  #{extraCopyright $ appExtra $ settings master}

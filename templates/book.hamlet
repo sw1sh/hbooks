@@ -1,8 +1,9 @@
-<h1>#{title}
-<img src=#{imageSrc}>
-<br>
-_{MsgType}: #{contentType}
-<br>
-<a href=#{fileUrl}>_{MsgDownload}
-<a href=@{EditBookR bid}>_{MsgEntryEdit}
-<a id=delete>_{MsgEntryDelete}
+<div .pagination-centered>
+  <h1>#{title}
+  <img src=#{imageSrc}>
+  <br>
+  _{MsgType}: #{contentType}
+  <br>
+  <a href=#{fileUrl}>_{MsgDownload}
+  <a href=@{EditBookR bid}>_{MsgEntryEdit}
+  <a id=delete>_{MsgEntryDelete}

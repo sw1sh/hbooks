@@ -26,6 +26,7 @@ Textbook: Textbook
 LectureNotes: Lecture notes
 OtherType: Other
 
+Categories: Categories
 Physics: Physics
 Mathematics: Mathematics
 Humanities: Humanities
