@@ -13,6 +13,7 @@ import Data.Conduit
 import Data.Conduit.Binary (sinkLbs)
 import Graphics.ImageMagick.MagickWand
 import Network.Curl
+import Numeric (showHex)
 import Lib.ImageMagick
 import Lib.MyPersist
 import Lib.S3
@@ -72,7 +73,9 @@ saveThumbnail Nothing title name = withMagickWandGenesis $ do
  
 saveFile :: FilePath -> Text -> Text -> ByteString -> IO ()
 saveFile name contentType filename blob = uploadToS3 ("files" </> name) contentType 
-  [("Content-Disposition", "filename=\"" ++ filename ++ "\"")] blob
+  [("Content-Disposition", "filename*=UTF-8''" ++ escapeUtf filename)] blob
+
+escapeUtf = concat . map (\w -> fromString $ "%" ++ showHex w "") . unpack . encodeUtf8
 
 downloadFile :: Text -> IO (Either String (String, String, ByteString))
 downloadFile url = do
