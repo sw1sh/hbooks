@@ -76,7 +76,7 @@ saveFile name contentType filename blob = uploadToS3 ("files" </> name) contentT
 
 downloadFile :: Text -> IO (Either String (String, String, ByteString))
 downloadFile url = do
-  resp <- curlGetResponse_ (unpack url) [CurlUserAgent "curl"]
+  resp <- curlGetResponse_ (unpack url) [CurlUserAgent "Mozilla/4.0", CurlFollowLocation True, CurlAutoReferer True]
     :: IO (CurlResponse_ [(String, String)] ByteString)
   IDouble size <- respGetInfo resp SizeDownload
   IString contentType <- respGetInfo resp ContentType
