@@ -55,7 +55,7 @@ saveThumbnail Nothing title name = withMagickWandGenesis $ do
   -- Set up a 9 point white font
   pw `setColor` "black"
   dw `setFillColor` pw
-  dw `setFont` "Arial"
+  dw `setFont` "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf"
   dw `setFontSize` 10
   -- Add a black outline to the text
 --  pw `setColor` "black"
