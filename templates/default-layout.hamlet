@@ -7,7 +7,7 @@
           <li>
             _{MsgLoginAs $ userIdent user}  
           <li>
-            <a href=@{AddBookR}>_{MsgEntryAdd}
+            <a href=@{AddBookR}>_{MsgAdd}
           <li>
             <a href=@{AuthR LogoutR}>_{MsgLogout}
           $if userAdmin user

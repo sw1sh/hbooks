@@ -5,3 +5,7 @@
 <ul>Tags
   $forall Entity _ tag <- tags
     <li>#{tagName tag}
+      <a .delete-tag ##{tagName tag}> x
+<form method=post enctype=#{enctype}>
+  ^{form}
+  <button type=submit>_{MsgAdd}

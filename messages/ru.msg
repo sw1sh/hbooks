@@ -1,8 +1,7 @@
 Hello: Здравствуйте
-EntryList: Список
-EntryAdd: Добавить
-EntryEdit: Редактировать
-EntryDelete: Удалить
+List: Список
+Add: Добавить
+Edit: Редактировать
 Logout: Выйти
 Login: Войти
 Admin: Админка
@@ -13,6 +12,7 @@ Author: Автор
 Type: Тип
 Category: Категория
 Tags: Тэги
+Tag: Тэг
 Thumbnail: Иконка
 Upload: Залить
 Url: Ссылка

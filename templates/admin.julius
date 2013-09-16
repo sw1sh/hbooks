@@ -1,0 +1,8 @@
+$('a.delete-tag').click(function() {
+  $.ajax({
+    type: 'POST',
+    data: {method: 'delete', tag: $(this).attr('id')}
+  }).done(function() {
+    $(location).attr('href',"@{AdminR}");
+  });     
+});

@@ -12,4 +12,4 @@
 /edit/#BookId EditBookR GET POST
 /download/#BookId DownloadR GET
 /search SearchR GET
-/admin AdminR GET
+/admin AdminR GET POST

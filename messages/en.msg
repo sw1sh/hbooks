@@ -1,8 +1,7 @@
 Hello: Hello
-EntryList: List
-EntryAdd: Add
-EntryEdit: Edit
-EntryDelete: Delete
+List: List
+Add: Add
+Edit: Edit
 Logout: Logout
 Login: Login
 Admin: Admin
@@ -13,6 +12,7 @@ Author: Author
 Type: Type
 Category: Category
 Tags: Tags
+Tag: Tag
 Thumbnail: Thumbnail
 Upload: Upload
 Url: Url
