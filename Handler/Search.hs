@@ -6,17 +6,34 @@ import Import
 import Prelude (read)
 import Database.Persist.Sql
 
-like field val = Filter field (Left $ concat ["%", val, "%"]) (BackendSpecificFilter "ILIKE")
+like field val = Filter field (Left val) (BackendSpecificFilter "ILIKE")
 
 
 getSearchR :: Handler Value
 getSearchR = do
+  maybeE <- lookupGetParam "e"
+  case maybeE of
+    Just "tags" ->
+      tagSearch
+    _ ->
+      bookSearch
+
+tagSearch = do
+  maybeQ <- lookupGetParam "q"
+  let tagFilter =
+        case maybeQ of
+          Just q -> [like TagName $ q ++ "%"]
+          Nothing -> []
+  tags <- runDB $ selectList tagFilter [Asc TagName]
+  returnJson tags
+
+bookSearch = do
   maybeQ <- lookupGetParam "q"
   maybeC <- lookupGetParam "c"
   maybeT <- lookupGetParam "t"
   let queryF = 
         case maybeQ of
-          Just q -> FilterOr [like BookTitle q, like BookAuthor q]
+          Just q -> FilterOr [like BookTitle $ "%"++q++"%", like BookAuthor $ "%"++q++"%"]
           Nothing -> FilterOr []
       categories =
         case maybeC of
