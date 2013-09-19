@@ -67,6 +67,7 @@ modifyBookR maybeBid = do
                   category,
                   toTags -> tags,
                   maybeThumb, 
+                  maybeThumbUrl,
                   maybeFile, 
                   maybeUrl, 
                   isDownload) -> do
@@ -75,11 +76,29 @@ modifyBookR maybeBid = do
       let tagIds = map (\(Entity id _) -> id) $ catMaybes maybeTags
           finishAction bid = do
             case maybeBook of
-              Just b | bookTitle b == title && isNothing maybeThumb ->
-                return ()
+              Just b | bookTitle b == title 
+                       && isNothing maybeThumb && isNothing maybeThumbUrl 
+                         -> redirect $ BookR bid
               _ ->
-                liftIO $ saveThumbnail maybeThumb title $ showId bid
-            redirect $ BookR bid
+                case maybeThumbUrl of
+                  Just url -> do
+                    res <- liftIO $ downloadFile url
+                    case res of
+                      Right (fromString -> contentType, _, blob) -> do
+                        liftIO $ saveThumbnail (Just (contentType, blob)) title $ showId bid
+                        redirect $ BookR bid
+                      Left err -> do
+                        setMessage $ toHtml err
+                        reshowForm
+                  Nothing -> do
+                    thumb <- 
+                      case maybeThumb of
+                        Just fi -> do
+                          blob <- runResourceT $ fileSource fi $$ sinkLbs
+                          return $ Just (fileContentType fi, repack blob)
+                        Nothing -> return Nothing
+                    liftIO $ saveThumbnail thumb title $ showId bid
+                    redirect $ BookR bid
       case maybeFile of
         Just file -> do    
           let ext = getFileExt $ fileName file
@@ -168,21 +187,23 @@ bookForm :: Maybe Book -> [Tag] -> Form (
   BookCategory, 
   Maybe Text, -- Tags
   Maybe FileInfo, -- Thumbnail
+  Maybe Text, -- Thumbnail URL
   Maybe FileInfo, -- Upload file
   Maybe Text, -- URL
   Bool -- Download from URL
   )
-bookForm maybeBook tags = renderDivs $ (,,,,,,,,)
+bookForm maybeBook tags = renderDivs $ (,,,,,,,,,)
   <$> areq textField (fieldSettingsLabel MsgTitle) (bookTitle <$> maybeBook)
   <*> areq textField (fieldSettingsLabel MsgAuthor) (bookAuthor <$> maybeBook)
   <*> areq (selectFieldList bookTypes) (fieldSettingsLabel MsgType) (bookType <$> maybeBook)
   <*> areq (selectFieldList bookCategories) (fieldSettingsLabel MsgCategory) (bookCategory <$> maybeBook)
   <*> aopt textField ((fieldSettingsLabel MsgTags) {fsId = Just "tag-field"}) (Just $ Just $ showTags tags)
   <*> fileAFormOpt (fieldSettingsLabel MsgThumbnail)
+  <*> aopt urlField (fieldSettingsLabel MsgUrl) Nothing
   <*> fileAFormOpt (fieldSettingsLabel MsgUpload)
-  <*> aopt textField (fieldSettingsLabel MsgUrl) (bookExternalLink <$> maybeBook)
+  <*> aopt urlField (fieldSettingsLabel MsgUrl) (bookExternalLink <$> maybeBook)
   <*> areq checkBoxField (fieldSettingsLabel MsgDownloadQ) (Just False)
-    
+
 getTags :: Maybe [TagId] -> Handler [Tag]
 getTags (Just ids) = do
   listMaybeTags <- mapM (runDB . get) ids

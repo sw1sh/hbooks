@@ -27,11 +27,10 @@ splitWords = concat . intersperse "\n" . words
 
 getFileExt = reverse . takeWhile (/='.') . reverse
 
-saveThumbnail :: Maybe FileInfo -> Text -> FilePath ->  IO ()
-saveThumbnail (Just fi) _ name = withMagickWandGenesis $ do
+saveThumbnail :: Maybe (Text, ByteString) -> Text -> FilePath ->  IO ()
+saveThumbnail (Just (contentType, blob)) _ name = withMagickWandGenesis $ do
   (_,w) <- magickWand
   pw <- pixelWand
-  blob <- repack <$> (runResourceT $ fileSource fi $$ sinkLbs)
   readImageBlob w blob
   setColor pw "none"
   setImageBackgroundColor w pw
@@ -43,7 +42,7 @@ saveThumbnail (Just fi) _ name = withMagickWandGenesis $ do
   extentImage w s s (-sx`div`2) (-sy`div`2)
   resizeImage w 120 150 lanczosFilter 1
   blob <- getImageBlob w
-  lift $ uploadToS3 ("img" </> name) (fileContentType fi) [] blob
+  lift $ uploadToS3 ("img" </> name) contentType [] blob
 
 saveThumbnail Nothing title name = withMagickWandGenesis $ do
   (_,w) <- magickWand
