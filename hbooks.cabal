@@ -84,6 +84,7 @@ library
                  , wai                           >= 1.4
                  , http-types                    >= 0.8
                  , mime-mail                     >= 0.4
+                 , mime-mail-ses                 >= 0.2
                  , blaze-markup                  >= 0.5
                  , hS3                           >= 0.5
 

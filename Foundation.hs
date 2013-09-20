@@ -5,6 +5,7 @@ import Yesod
 import Yesod.Static
 import Yesod.Auth
 import Network.Mail.Mime
+import Network.Mail.Mime.SES
 import Text.Shakespeare.Text (stext)
 import Text.Blaze.Renderer.Utf8 (renderHtml)
 import Yesod.Auth.Email
@@ -12,6 +13,7 @@ import Yesod.Auth.GoogleEmail
 import Yesod.Default.Config
 import Yesod.Default.Util (addStaticContentExternal)
 import Network.HTTP.Conduit (Manager)
+import System.Environment (getEnv)
 import qualified Settings
 import Settings.Development (development)
 import qualified Database.Persist
@@ -161,8 +163,11 @@ instance YesodAuthEmail App where
     addUnverified email verkey =
         runDB $ insert $ User email Nothing (Just verkey) False False
 
-    sendVerifyEmail email _ verurl =
-        liftIO $ renderSendMail (emptyMail $ Address Nothing "noreply")
+    sendVerifyEmail email _ verurl = do
+        [akey, skey] <- liftIO $ mapM getEnv ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+        let ses = SES "uboarders@gmail.com" [encodeUtf8 email] (fromString akey) (fromString skey)
+        manager <- httpManager <$> getYesod
+        renderSendMailSES manager ses (emptyMail $ Address Nothing "uboarders@gmail.com")
             { mailTo = [Address Nothing email]
             , mailHeaders =
                 [ ("Subject", "Verify your email address")
