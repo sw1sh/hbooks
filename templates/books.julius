@@ -24,13 +24,17 @@ $("#search_button").click(function() {
     categories = categories + $(this).attr('id') + ' ';
   });
   $('.tag.active').each(function() {
-    tags = tags + $(this).attr('id') + ' ';
+    tags = tags + $(this).html() + ' ';
   });
   $.getJSON('/search?q='+query+'&c='+categories+'&t='+tags)
   .done(function (data) {
     var items = "";
  
     $.each(data, function(key, val) {
+      var tags = [];
+      $.each(val.value.tags, function(key, val) {
+        tags.push($('a.tag#'+val).html());
+      });
       items +=
         '<tr><td> \
          <div class=book_item id=' + key + '>' 
@@ -50,8 +54,13 @@ $("#search_button").click(function() {
                    <div class="span3 offset3">'
                      + $('a.type#'+val.value.type).html() + ' \
                    </div> \
-                   <div class="span3 offset3">'
+                   <div class="span3">'
                      + $('a.category#'+val.value.category).html() + ' \
+                   </div> \
+                   <div class=row-fluid> \
+                     <div class=span12>'
+                       + tags + ' \
+                     </div> \
                    </div> \
                  </div> \
                </div> \

@@ -18,5 +18,5 @@
     <div .span2>
       $forall Entity tid tag <- tags
         <li>
-          <a .tag ##{tagName tag}>#{tagName tag}
+          <a .tag ##{asText $ showId tid}>#{tagName tag}
     
