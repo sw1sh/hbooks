@@ -3,10 +3,21 @@
 module Handler.Admin where
 
 import Import
+import Yesod.Auth
 import Data.Char (isAlphaNum)
+
+requireAdmin = do
+  Entity _ user <- requireAuth
+  if userAdmin user then
+    return ()
+    else do
+      setMessage "You're not an admin!"
+      redirect BooksR
+      
 
 postAdminR :: Handler Html
 postAdminR = do
+  requireAdmin
   maybeMethod <- runInputPost $ iopt textField "method"
   case maybeMethod of
     Just "delete" -> do
@@ -22,6 +33,7 @@ postAdminR = do
   redirect AdminR
 
 getAdminR = do
+  requireAdmin
   users <- runDB $ selectList [] [Asc UserId]
   tags <- runDB $ selectList [] [Asc TagId]
   ((res, form), enctype) <- runFormPost addTagForm

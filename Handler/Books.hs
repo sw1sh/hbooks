@@ -37,9 +37,10 @@ postBookR bid = do
       let ownerId = bookOwner book
       if uid == ownerId then do
         runDB $ delete bid 
-        redirect BooksR
-        else
-          error "You're not allowed to delete this!"
+        setMessage "Book successfully deleted!"
+        else do
+          setMessage "You can't delete this book!"
+      redirect BooksR
     _ -> error "Unknown method"
 
 modifyBook uid maybeBid book =
@@ -57,6 +58,14 @@ modifyBookR maybeBid = do
   uid <- requireAuthId
   alreadyExpired
   maybeBook <- maybe (return Nothing) (runDB . get) maybeBid
+  case (maybeBid, maybeBook) of
+    (Just bid, Just book) ->
+      if bookOwner book == uid then
+        return ()
+        else do
+          setMessage "You can't edit this book!"
+          redirect $ BookR bid
+    _ -> return ()
   tags <- getTags $ bookTags <$> maybeBook
   ((res, form), enctype) <- runFormPost $ bookForm maybeBook tags
   let reshowForm = defaultLayout $(widgetFile "bookform")
