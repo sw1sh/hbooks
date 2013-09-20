@@ -6,4 +6,6 @@
   <br>
   <a href=#{fileUrl}>_{MsgDownload}
   <a href=@{EditBookR bid}>_{MsgEdit}
-  <a id=delete>_{MsgDelete}
+  <form .delete-form method=post>
+    <input type=hidden name=method value=delete>
+    <a #delete href=#>_{MsgDelete}
