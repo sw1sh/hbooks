@@ -1,21 +1,25 @@
-<div .row-fluid>
-  <form ."form-search span10 offset2">
-     <div ."input-prepend">
-        <button .btn #search_button type=button>Search
-        <input .search-query #search_field type=text autofocus=true name=q>
+<div .row>
+  <div ."col-md-4 col-md-offset-2">
+    <form .form-search>
+      <div ."input-group">
+        <span .input-group-btn>
+          <button ."btn btn-default" #search_button type=button>Search
+        <input ."search-query form-control" #search_field type=text autofocus=true name=q>
 
-  <div .row-fluid>
-    <div .span2>
-      $forall (itype,type) <- bookTypes
-        <a .type ##{asText $ show type} style="visibility: hidden">_{itype}
-      <ul ."nav nav-list">
-        <li .nav-header>_{MsgCategories}
-        $forall (icategory,category) <- bookCategories
-          <li>
-            <a .category ##{asText $ show category}>_{icategory}
-    <div .span8>
-      <div ."content" #list>
-    <div .span2>
+<div .row>
+  <div .col-md-2>
+    $forall (itype,type) <- bookTypes
+      <a .type ##{asText $ show type} style="visibility: hidden">_{itype}
+    <ul ."nav nav-pills nav-stacked">
+      <li .nav-header>_{MsgCategories}
+      $forall (icategory,category) <- bookCategories
+        <li>
+          <a .category ##{asText $ show category}>_{icategory}
+  <div .col-md-8>
+    <div ."content" #list>
+  <div .col-md-2>
+    <ul ."nav nav-pills nav-stacked">
+      <li .nav-header>_{MsgTags}
       $forall Entity tid tag <- tags
         <li>
           <a .tag ##{asText $ showId tid}>#{tagName tag}

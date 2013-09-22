@@ -17,10 +17,13 @@ $('.category, .tag').click(function() {
 });
 
 var page = 1;
+var resetPage = true;
 $("#search_button").click(function() {
   var query = $("#search_field").val();
   var categories = '';
   var tags = '';
+  if (resetPage) { page = 1; }
+  resetPage = true;
   $('.category.active').each(function() {
     categories = categories + $(this).attr('id') + ' ';
   });
@@ -31,6 +34,7 @@ $("#search_button").click(function() {
     $("#list").html(data);
     $('a.page').click(function() {
       page = $(this).attr('id');
+      resetPage = false;
       $('#search_button').click();
     });
   },"html");

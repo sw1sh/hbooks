@@ -3,28 +3,28 @@
     <tr><td> 
       <div .book_item id=#{asText $ showId bid}>
 
-        <div ."row-fluid span12">
-          <div .span2>
+        <div ."row">
+          <div .col-md-3>
             <img src=http://s3.amazonaws.com/hbooks-static/img/#{asText $ showId bid}>
           
-          <div .span10>
-            <div ."row-fluid span12">
+          <div .col-md-9>
+            <div ."row">
               <a href=/book/#{asText $ showId bid}>#{bookTitle book}
 
-              <div ."row-fluid">
-                <div .span9>...
-                <div .span3>#{bookAuthor book}
+            <div ."row">
+              <div .col-md-9>...
+              <div .col-md-3>#{bookAuthor book}
 
-                <div .row-fluid>
-                  <div ."span3 offset3">#{asText $ show $ bookType book}
-                  <div ."span3">#{asText $ show $ bookCategory book}
+            <div .row>
+               <div ."col-md-3 col-md-offset-3">#{asText $ show $ bookType book}
+               <div ."col-md-3">#{asText $ show $ bookCategory book}
               
-                  <div .row-fluid>
-                    <div .span12>
-                      <ul .tags>
-                        $forall tag <- bookTags book
-                          $maybe tagName <- lookup tag tags
-                            <li>#{tagName} 
+            <div .row>
+              <div .col-md-12>
+                <ul ."nav nav-pills">
+                  $forall tag <- bookTags book
+                    $maybe tagName <- lookup tag tags
+                      <li>#{tagName} 
                         
 <ul .pagination>
   $forall p <- pages

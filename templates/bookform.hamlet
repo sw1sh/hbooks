@@ -1,7 +1,47 @@
-<form .pagination-centered method=post enctype=#{enctype}>
-  ^{form}
-  <button type=submit>
-    $maybe _ <- maybeBook 
-      Edit
-    $nothing
-      Add
+<form method=post enctype="multipart/form-data">
+  <div ."form-group required">
+    <label for=title>_{MsgTitle}
+    <input #title .form-control name=title type=text required value=#{maybe "" bookTitle book}>
+  <div ."form-group required">
+    <label for=author>_{MsgAuthor}
+    <input #author .form-control name=author type=text required value=#{maybe "" bookAuthor book}>
+  <div ."form-group required">
+    <label for=booktype>_{MsgType}
+    <select #booktype .form-control name=booktype>
+      $forall (k,v) <- bookTypes
+        $if checkMaybe bookType v book
+          <option selected="selected" value=#{1 + fromEnum v}>_{k}
+        $else
+          <option value=#{1 + fromEnum v}>_{k}
+  <div ."form-group required">
+    <label for=bookcategory>_{MsgCategory}
+    <select #bookcategory .form-control name=bookcategory>
+      $forall (k,v) <- bookCategories
+        $if checkMaybe bookCategory v book
+          <option selected="selected" value=#{1 + fromEnum v}>_{k}
+        $else
+          <option value=#{1 + fromEnum v}>_{k}
+  <div ."form-group optional">
+    <label for="tag-field">_{MsgTags}
+    <input #tag-field .form-control name=tags type=text value=#{showTags tags}>
+  <div .form-group>
+      <label for=thumbnail>_{MsgThumbnail}
+      <input #thumbnail .form-control type=file name=thumbnail>
+      <label for=thumburl>_{MsgUrl}
+      <input #thumburl .form-control name=thumburl type=url>
+  <div .form-group>
+    <div .optional>
+      <label for=file>_{MsgUpload}
+      <input #file .form-control type=file name=uploadfile>
+    <div .optional>
+      <label for=fileurl>_{MsgUrl}
+      <input #fileurl .form-control name=fileurl type=url value=#{maybe "" id (bookExternalLink =<< book)}>
+  <div ."form-group required">
+    <label for=downloadQ>_{MsgDownload}
+    <input #downloadQ .form-control type=checkbox name=downloadQ value="yes">
+  <div .form-group>
+    <button ."btn btn-default" type=submit>
+      $maybe _ <- book 
+        _{MsgEdit}
+      $nothing
+        _{MsgAdd}
