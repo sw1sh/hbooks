@@ -1,0 +1,29 @@
+<table ."table table-striped">
+  $forall Entity bid book <- books
+    <tr><td> 
+      <div .book_item id=#{asText $ showId bid}>
+
+        <div ."row-fluid span12">
+          <div .span2>
+            <img src=http://s3.amazonaws.com/hbooks-static/img/#{asText $ showId bid}>
+          
+          <div .span10>
+            <div ."row-fluid span12">
+              <a href=/book/#{asText $ showId bid}>#{bookTitle book}
+
+              <div ."row-fluid">
+                <div .span9>...
+                <div .span3>#{bookAuthor book}
+
+                <div .row-fluid>
+                  <div ."span3 offset3">#{asText $ show $ bookType book}
+                  <div ."span3">#{asText $ show $ bookCategory book}
+              
+                  <div .row-fluid>
+                    <div .span12>
+                      <ul .tags>
+                        $forall tag <- bookTags book
+                          $maybe tagName <- lookup tag tags
+                            <li>#{tagName} 
+                        
+

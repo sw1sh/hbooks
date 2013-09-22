@@ -3,13 +3,14 @@
 module Handler.Search where
 
 import Import
+import Text.Hamlet
 import Prelude (read)
 import Database.Persist.Sql
 
 like field val = Filter field (Left val) (BackendSpecificFilter "ILIKE")
 
 
-getSearchR :: Handler Value
+getSearchR :: Handler TypedContent
 getSearchR = do
   maybeE <- lookupGetParam "e"
   case maybeE of
@@ -25,12 +26,13 @@ tagSearch = do
           Just q -> [like TagName $ q ++ "%"]
           Nothing -> []
   tags <- runDB $ selectList tagFilter [Asc TagName]
-  returnJson tags
+  selectRep $
+    provideRep $ returnJson tags
 
 bookSearch = do
-  maybeQ <- lookupGetParam "q"
-  maybeC <- lookupGetParam "c"
-  maybeT <- lookupGetParam "t"
+  maybeQ <- lookupGetParam "q" -- search query
+  maybeC <- lookupGetParam "c" -- category
+  maybeT <- lookupGetParam "t" -- tags
   let queryF = 
         case maybeQ of
           Just q -> FilterOr [like BookTitle $ "%"++q++"%", like BookAuthor $ "%"++q++"%"]
@@ -45,19 +47,14 @@ bookSearch = do
           Just t -> words t
           Nothing -> []
 
-  let takeId (Entity id _) = id
-  (map takeId -> tagIds) <- runDB $ selectList [TagName <-. tagNames] []
+  (map entityKey -> tagIds) <- runDB $ selectList [TagName <-. tagNames] []
   
   let bookFilter = [ queryF, BookCategory <-. categories ]
-                     
   
-  books <- runDB $ selectList bookFilter [Asc BookId]
-  returnJson $ 
-    if null tagIds then 
-      books 
-      else filter (any (`elem`tagIds) . bookTags . entityVal) books
-
-translate dict get set x = 
-  case lookup (get x) dict of
-    Just v -> set x v 
-    Nothing -> x
+  books' <- runDB $ selectList bookFilter [Asc BookId]
+  let books = if null tagIds then books'
+              else filter (any (`elem`tagIds) . bookTags . entityVal) books'
+  (map (\(Entity tid tag) -> (tid, tagName tag)) -> tags) <- runDB $ selectList [] [Asc TagId]
+  selectRep $ do
+    provideRep $ returnJson $ books
+    provideRep $ giveUrlRenderer $(hamletFile "templates/search.hamlet")
