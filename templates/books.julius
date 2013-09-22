@@ -16,6 +16,7 @@ $('.category, .tag').click(function() {
   $('#search_button').click();
 });
 
+var page = 1;
 $("#search_button").click(function() {
   var query = $("#search_field").val();
   var categories = '';
@@ -26,8 +27,11 @@ $("#search_button").click(function() {
   $('.tag.active').each(function() {
     tags = tags + $(this).html() + ' ';
   });
-  $.get('/search?q='+query+'&c='+categories+'&t='+tags, function (data) {
+  $.get('/search?q='+query+'&c='+categories+'&t='+tags+'&p='+page, function (data) {
     $("#list").html(data);
-  },"html");  
-})
-
+    $('a.page').click(function() {
+      page = $(this).attr('id');
+      $('#search_button').click();
+    });
+  },"html");
+});

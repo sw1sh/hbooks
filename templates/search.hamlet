@@ -26,4 +26,10 @@
                           $maybe tagName <- lookup tag tags
                             <li>#{tagName} 
                         
-
+<ul .pagination>
+  $forall p <- pages
+    <li>
+      $if p == show page
+        <a href="#" ."page active" ##{p}>#{p}
+      $else
+        <a href="#" .page ##{p}>#{p}
