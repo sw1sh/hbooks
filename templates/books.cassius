@@ -1,2 +1,14 @@
-.active
+a.category
+  color: blue
+a.tag
+  color: blue
+a.page
+  color: blue
+
+a.category.active
   color: red
+a.tag.active
+  color: red
+a.page.active
+  color: red
+

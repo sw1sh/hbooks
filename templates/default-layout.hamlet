@@ -18,11 +18,11 @@
             <a href=@{AuthR LoginR}>_{MsgLogin}
       <ul ."nav navbar-nav pull-right">
         <li>
-          <a .lang id=en>eng
+          <a href=# .lang id=en>eng
         <li>
-          <a .lang id=ru>рус
+          <a href=# .lang id=ru>рус
         <li>
-          <a .lang id=jp>日本語
+          <a href=# .lang id=jp>日本語
 
 <div #main role=main>
   <div .container>
