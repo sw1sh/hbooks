@@ -62,7 +62,7 @@ bookSearch = do
       books'' = if null tagIds then books'
                 else filter (any (`elem`tagIds) . bookTags . entityVal) books'
       books = take perPage $ drop ((page-1)*perPage) books''
-      pages = map (asText . show) [1..length books'' `div` (perPage + 1) + 1]
+      pages = map tshow [1..length books'' `div` (perPage + 1) + 1]
   (map (\(Entity tid tag) -> (tid, tagName tag)) -> tags) <- runDB $ selectList [] [Asc TagId]
   selectRep $ do
     provideRep $ returnJson $ books

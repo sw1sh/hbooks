@@ -16,8 +16,8 @@
               <div .col-md-3>#{bookAuthor book}
 
             <div .row>
-               <div ."col-md-3 col-md-offset-3">#{asText $ show $ bookType book}
-               <div ."col-md-3">#{asText $ show $ bookCategory book}
+               <div ."col-md-3 col-md-offset-3">#{tshow $ bookType book}
+               <div ."col-md-3">#{tshow $ bookCategory book}
               
             <div .row>
               <div .col-md-12>
@@ -29,7 +29,7 @@
 <ul .pagination>
   $forall p <- pages
     <li>
-      $if p == show page
+      $if p == tshow page
         <a href="#" ."page active" ##{p}>#{p}
       $else
         <a href="#" .page ##{p}>#{p}

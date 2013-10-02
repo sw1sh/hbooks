@@ -18,7 +18,7 @@ import Lib.ImageMagick
 import Lib.MyPersist
 import Lib.S3
 
-showPersist (PersistInt64 i) = show i
+showPersist (PersistInt64 i) = fromString $ show i
 showPersist _ = undefined 
 
 showId = showPersist . unKey
@@ -88,10 +88,10 @@ downloadFile url = do
     err -> return $ Left $ show err
 
 instance ToJSON BookType where
-  toJSON bt = toJSON (show bt :: Text)
+  toJSON = toJSON . tshow
 
 instance ToJSON BookCategory where
-  toJSON bt = toJSON (show bt :: Text)
+  toJSON = toJSON . tshow
 
 instance FromJSON BookType where
   parseJSON (String f) = return $ read $ unpack f

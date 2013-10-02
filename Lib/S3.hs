@@ -10,7 +10,7 @@ import Network.AWS.AWSResult
 import System.Environment
 
 uploadToS3 :: FilePath -> Text -> [(String, Text)] -> ByteString -> IO ()
-uploadToS3 (unpack -> name) (unpack -> contentType) 
+uploadToS3 (fpToString -> name) (unpack -> contentType) 
            (map (second unpack) -> headers) (repack -> blob) = do
   bucket <- getEnv "S3_BUCKET_NAME"
   let obj = S3Object bucket name contentType headers blob

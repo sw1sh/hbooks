@@ -1,6 +1,6 @@
 module Foundation where
 
-import ClassyPrelude hiding (insert)
+import ClassyPrelude 
 import Yesod
 import Yesod.Static
 import Yesod.Auth

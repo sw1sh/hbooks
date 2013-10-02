@@ -77,7 +77,7 @@ library
                  , conduit                       >= 1.0
                  , monad-logger                  >= 0.3
                  , fast-logger                   >= 0.3
-                 , classy-prelude                >= 0.5
+                 , classy-prelude                >= 0.6
                  , lens                          >= 3.9
                  , imagemagick                   >= 0.0.2
                  , curl                          >= 1.3

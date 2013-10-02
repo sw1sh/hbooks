@@ -9,12 +9,12 @@
 <div .row>
   <div .col-md-2>
     $forall (itype,type) <- bookTypes
-      <a href=# .type ##{asText $ show type} style="visibility: hidden">_{itype}
+      <a href=# .type ##{tshow type} style="visibility: hidden">_{itype}
     <ul ."nav nav-pills nav-stacked">
       <li .nav-header>_{MsgCategories}
       $forall (icategory,category) <- bookCategories
         <li>
-          <a href=# .category ##{asText $ show category}>_{icategory}
+          <a href=# .category ##{tshow category}>_{icategory}
   <div .col-md-8>
     <div ."content" #list>
   <div .col-md-2>

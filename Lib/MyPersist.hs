@@ -16,10 +16,10 @@ instance PersistFieldSql BookCategory where
   sqlType _ = SqlString
 
 instance PersistField BookType where
-  toPersistValue = PersistText . show
+  toPersistValue = PersistText . tshow
   fromPersistValue (PersistText text) = Right $ read (unpack text)
 
 instance PersistField BookCategory where
-  toPersistValue = PersistText . show
+  toPersistValue = PersistText . tshow
   fromPersistValue (PersistText text) = Right $ read (unpack text)
 

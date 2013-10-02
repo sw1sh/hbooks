@@ -2,7 +2,7 @@ module Import
     ( module Import
     ) where
 
-import           ClassyPrelude        as Import hiding (delete, insert)
+import           ClassyPrelude        as Import 
 import           Yesod                as Import hiding (Route (..))
 import           Foundation           as Import
 import           Model                as Import
